@@ -1,0 +1,619 @@
+/* --- Global & Reset --- */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+* { box-sizing: border-box; }
+button {
+  cursor: pointer;
+  font-size: 1em;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* --- Halaman Login (index.html) --- */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #005aa7, #fffde4);
+}
+.login-container {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 90%;
+  max-width: 450px;
+}
+.login-container h1 {
+  margin-top: 0;
+  color: #005aa7;
+}
+.login-container input {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.1em;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  margin: 20px 0;
+}
+.login-container button {
+  background-color: #28a745;
+  color: white;
+  width: 100%;
+  padding: 14px;
+  font-size: 1.2em;
+}
+.login-container button:hover {
+  background-color: #218838;
+}
+
+/* --- Halaman Game Pemain (game.html) --- */
+.game-header {
+  background: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.game-header h1 { margin: 0; font-size: 1.5em; color: #005aa7; }
+.player-info { font-size: 1.1em; }
+.call-display-mini { font-size: 1.2em; }
+.call-display-mini span {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #d9534f;
+  min-width: 40px;
+  display: inline-block;
+  text-align: center;
+}
+
+#status-bar {
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  font-size: 1.1em;
+}
+.status-idle, .status-stopped { background-color: #6c757d; }
+.status-running { background-color: #007bff; }
+
+.game-page h2, .game-page p { text-align: center; }
+#tickets-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+.ticket {
+  background: white;
+  border: 2px solid #005aa7;
+  border-radius: 10px;
+  padding: 15px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.ticket h3 { text-align: center; margin-top: 0; }
+.ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.number-cell {
+  padding: 15px 5px;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-align: center;
+  background-color: #ffff00; /* Latar kuning */
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  border: 1px solid #999; /* Border tipis antar sel */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+}
+.number-cell.marked {
+  background-color: #28a745;
+  color: white;
+  text-decoration: line-through;
+  transform: scale(0.95);
+}
+.number-cell.shake {
+  animation: shake 0.3s;
+  background-color: #f8d7da;
+  color: #721c24;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.prize-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
+}
+.claim-button {
+  flex: 1;
+  background-color: #dc3545;
+  color: white;
+  font-size: 0.9em;
+}
+
+/* --- Halaman Display (display.html) --- */
+.display-page {
+  background: #0f0c29;
+  background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+  background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  padding: 20px;
+}
+.display-container {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  height: 100%;
+}
+.last-number-box {
+  flex-basis: 35%;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.last-number-box .title {
+  font-size: 2.5vw;
+  font-weight: 300;
+  opacity: 0.8;
+}
+#last-number-display {
+  font-size: 20vw;
+  font-weight: bold;
+  color: #f2c94c;
+  line-height: 1.1;
+}
+.number-board-box {
+  flex-basis: 65%;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 20px;
+}
+.number-board-box .title {
+  font-size: 1.5vw;
+  text-align: center;
+  margin-bottom: 20px;
+}
+#number-board {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 1%;
+  height: calc(100% - 40px);
+}
+.board-cell {
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2.2vw;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+.board-cell.called {
+  background-color: #f2c94c;
+  color: #333;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px #f2c94c;
+}
+#winner-toast {
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #f2c94c, #f2994a);
+  color: #333;
+  padding: 30px 50px;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  font-size: 2.5em;
+  text-align: center;
+  z-index: 200;
+  transition: top 0.5s ease-in-out;
+}
+#winner-toast.show {
+  top: 0;
+}
+
+/* --- Halaman Admin (admin.html) --- */
+.admin-page { padding: 20px; }
+.admin-page h1 { text-align: center; color: #005aa7; }
+
+#admin-login-container {
+  max-width: 400px;
+  margin: 30px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+#admin-login-container input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1em;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+#admin-login-button {
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+}
+
+#admin-dashboard h2 { text-align: center; }
+.admin-controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+#admin-start-button { background-color: #28a745; color: white; }
+#admin-stop-button { background-color: #dc3545; color: white; }
+#admin-status {
+  text-align: center;
+  font-size: 1.3em;
+  font-weight: bold;
+  margin: 20px 0;
+}
+.admin-columns {
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.admin-col {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.log-box {
+  height: 400px;
+  overflow-y: auto;
+  background: #f4f7f6;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 6px;
+}
+.log-number {
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 50%;
+  font-weight: bold;
+  margin: 5px;
+}
+#winners-log li {
+  background: #e6f7ff;
+  border: 1px solid #b3e0ff;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  list-style-type: none;
+}
+/* ... (Gaya sebelumnya) ... */
+
+/* --- Halaman Game Pemain (game.html) --- */
+/* ... (Gaya header, status bar, dll) ... */
+
+#tickets-container {
+  display: flex;
+  flex-direction: column; /* Ubah ke kolom agar bagian warna tumpuk */
+  align-items: center; /* Tetap di tengah */
+  gap: 30px; /* Jarak antar bagian warna */
+  padding: 20px;
+}
+
+/* Bagian Warna Tiket (DIUBAH UNTUK 1 TIKET) */
+.ticket-section {
+    width: 100%;
+    max-width: 600px; /* Lebarkan sedikit */
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.ticket-section h3 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #555;
+    border-bottom: 2px solid; /* Garis bawah judul */
+    padding-bottom: 5px;
+}
+
+/* Style untuk 1 tiket saja */
+.ticket-single { 
+    background-color: #f0f4f8; /* Warna netral */
+    border-left: 8px solid #005aa7; /* Border biru */
+}
+.ticket-single h3 { 
+    border-bottom-color: #005aa7; 
+}
+
+/* Grid Baru 5 Kolom x 6 Baris */
+.ticket-grid-5x6 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 kolom */
+  grid-template-rows: repeat(6, auto); /* 6 baris */
+  gap: 0; /* Hilangkan gap untuk tampilan tabel rapat */
+  background-color: #ffff00; /* Latar kuning untuk seluruh grid */
+  border: 2px solid #333; /* Border luar */
+  overflow: hidden; /* Agar border radius rapi */
+  border-radius: 8px;
+}
+
+.number-cell {
+  padding: 15px 5px;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-align: center;
+  background-color: #ffff00; /* Latar kuning */
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  border: 1px solid #999; /* Border tipis antar sel */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+}
+
+.prize-buttons {
+  margin-top: 15px;
+  display: flex; /* Biarkan flex */
+  justify-content: center; /* Pusatkan satu tombol */
+}
+.claim-button {
+  /* ... (gaya sebelumnya) ... */
+   min-width: 150px; /* Lebar minimum */
+   background-color: #007bff; /* Warna biru untuk klaim */
+}
+.claim-button:disabled:not([style*="background-color"]) { /* Gaya disable SEBELUM sukses */
+    background-color: #aaa;
+}
+
+
+/* --- Halaman Display (display.html) --- */
+.display-page {
+    /* ... (gaya background gelap) ... */
+    flex-direction: row; /* Kembali ke row */
+    align-items: stretch; /* Penuhi tinggi */
+}
+
+.display-container {
+    /* ... (gaya flex, gap) ... */
+     height: 95%; /* Kurangi sedikit agar ada padding */
+}
+
+/* Panel Kiri Baru */
+.left-panel {
+    flex-basis: 100%; /* Lebar panel kiri */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Jarak antar box di kiri */
+}
+
+.last-number-box-small { /* Box angka terakhir yg kecil */
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+}
+.last-number-box-small .title { font-size: 1.5vw; opacity: 0.8; margin-bottom: 5px; }
+#last-number-display { font-size: 8vw; font-weight: bold; color: #f2c94c; }
+
+/* Box Info Game */
+.game-info-box {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 1.3vw;
+}
+.game-info-box .title { font-size: 1.5vw; opacity: 0.8; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;}
+.game-info-box div { margin-bottom: 5px;}
+
+/* Box Daftar Pemenang */
+.winner-list-box {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 15px;
+    flex-grow: 1; /* Ambil sisa ruang */
+    display: flex;
+    flex-direction: column;
+}
+.winner-list-box .title { font-size: 1.5vw; opacity: 0.8; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;}
+#winner-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto; /* Scroll jika daftar panjang */
+    font-size: 1.1vw;
+    flex-grow: 1;
+}
+#winner-list li {
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 5px;
+    padding: 5px 8px;
+    border-radius: 4px;
+}
+
+/* Papan Angka tetap sama */
+.number-board-box {
+    flex-basis: 70%; /* Sesuaikan lebar */
+    /* ... (gaya lainnya) ... */
+}
+#number-board { /* Sedikit penyesuaian ukuran */
+   gap: 0.8%;
+}
+.board-cell { font-size: 1.8vw; }
+
+
+/* --- Halaman Admin --- */
+/* ... (gaya login, dashboard umum) ... */
+
+.admin-settings {
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.admin-settings label { margin: 0 10px 0 20px; font-weight: bold;}
+.admin-settings select, .admin-settings input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1em;}
+
+.admin-controls button { font-size: 1.1em; } /* Sedikit besarkan tombol kontrol */
+
+.admin-columns { /* Tata letak kolom */
+    gap: 30px;
+}
+.number-caller-col { /* Kolom pemanggil angka lebih lebar */
+    flex: 2;
+}
+.admin-col:last-child { /* Kolom log pemenang */
+    flex: 1;
+}
+
+/* Grid Angka Admin */
+#admin-number-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 8px;
+    margin-top: 15px;
+    max-height: 450px; /* Batasi tinggi & scroll jika perlu */
+    overflow-y: auto;
+    padding: 5px;
+}
+.number-button {
+    padding: 10px 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.number-button:hover:not(:disabled) {
+    background-color: #e9ecef;
+}
+.number-button.called {
+    background-color: #6c757d;
+    color: white;
+    text-decoration: line-through;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.number-button:disabled:not(.called) { /* Disabled tapi belum dipanggil (misal saat pause) */
+     background-color: #f8f9fa;
+     cursor: not-allowed;
+     opacity: 0.8;
+}
+
+/* Log pemenang sedikit diubah */
+#winners-log li {
+   font-size: 0.9em;
+   /* ... (gaya lain) ... */
+}
+
+
+/* --- Halaman Monitor Baru (monitor.html) --- */
+.monitor-page {
+    background: #1a1a2e; /* Warna gelap */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+#monitor-number-container {
+    /* Container untuk efek animasi */
+    perspective: 1000px;
+}
+#monitor-number {
+    font-size: 40vw; /* SUPER BESAR */
+    font-weight: bold;
+    color: #ffd700; /* Emas */
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.3);
+    display: inline-block;
+    /* HAPUS 'transition' dari sini agar tidak bentrok dengan keyframe */
+    opacity: 0; /* Sembunyi normalnya */
+    transform: scale(0.5); /* Kecil normalnya */
+}
+
+/* Class baru untuk memicu animasi */
+#monitor-number-container.animating #monitor-number {
+    /* Jalankan animasi 'numberPulse' selama 2.5 detik */
+    animation: numberPulse 2.5s ease-in-out forwards;
+}
+
+/* Keyframe baru: Kecil -> Besar -> Kecil (Hilang) */
+@keyframes numberPulse {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    40% {
+        transform: scale(1.1); /* Membesar */
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.5); /* Mengecil dan Hilang */
+        opacity: 0;
+    }
+}
+/* Separator hitam antara pasangan baris */
+/* Baris 2 (sel 6-10): border bawah tebal hitam */
+.number-cell:nth-child(n+6):nth-child(-n+10) {
+  border-bottom: 4px solid #000;
+}
+
+/* Baris 4 (sel 16-20): border bawah tebal hitam */
+.number-cell:nth-child(n+16):nth-child(-n+20) {
+  border-bottom: 4px solid #000;
+}

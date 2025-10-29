@@ -1,0 +1,92 @@
+/* --- Halaman Display (display.html) --- */
+.display-page {
+  background: #0f0c29;
+  background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+  background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  padding: 20px;
+  flex-direction: row; /* Kembali ke row */
+  align-items: stretch; /* Penuhi tinggi */
+}
+.display-container {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  height: 95%; /* Kurangi sedikit agar ada padding */
+}
+
+#winner-toast {
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #f2c94c, #f2994a);
+  color: #333;
+  padding: 30px 50px;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  font-size: 2.5em;
+  text-align: center;
+  z-index: 200;
+  transition: top 0.5s ease-in-out;
+}
+#winner-toast.show {
+  top: 0;
+}
+
+/* Panel Kiri Baru */
+.left-panel {
+    flex-basis: 100%; /* Lebar panel kiri */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Jarak antar box di kiri */
+}
+
+.last-number-box-small { /* Box angka terakhir yg kecil */
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+}
+.last-number-box-small .title { font-size: 1.5vw; opacity: 0.8; margin-bottom: 5px; }
+#last-number-display { font-size: 8vw; font-weight: bold; color: #f2c94c; }
+
+/* Box Info Game */
+.game-info-box {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 1.3vw;
+}
+.game-info-box .title { font-size: 1.5vw; opacity: 0.8; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;}
+.game-info-box div { margin-bottom: 5px;}
+
+/* Box Daftar Pemenang */
+.winner-list-box {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 15px;
+    flex-grow: 1; /* Ambil sisa ruang */
+    display: flex;
+    flex-direction: column;
+}
+.winner-list-box .title { font-size: 1.5vw; opacity: 0.8; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;}
+#winner-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto; /* Scroll jika daftar panjang */
+    font-size: 1.1vw;
+    flex-grow: 1;
+}
+#winner-list li {
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 5px;
+    padding: 5px 8px;
+    border-radius: 4px;
+}

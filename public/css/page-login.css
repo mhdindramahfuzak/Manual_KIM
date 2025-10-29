@@ -1,0 +1,39 @@
+/* --- Halaman Login (index.html) --- */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #005aa7, #fffde4);
+}
+.login-container {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 90%;
+  max-width: 450px;
+}
+.login-container h1 {
+  margin-top: 0;
+  color: #005aa7;
+}
+.login-container input {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.1em;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  margin: 20px 0;
+}
+.login-container button {
+  background-color: #28a745;
+  color: white;
+  width: 100%;
+  padding: 14px;
+  font-size: 1.2em;
+}
+.login-container button:hover {
+  background-color: #218838;
+}

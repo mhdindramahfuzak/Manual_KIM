@@ -1,0 +1,164 @@
+/* --- Halaman Admin (admin.html) --- */
+.admin-page { padding: 20px; }
+.admin-page h1 { text-align: center; color: #005aa7; }
+
+#admin-login-container {
+  max-width: 400px;
+  margin: 30px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+#admin-login-container input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1em;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+#admin-login-button {
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+}
+
+#admin-dashboard h2 { text-align: center; }
+.admin-controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+#admin-start-button { background-color: #28a745; color: white; }
+#admin-stop-button { background-color: #dc3545; color: white; }
+#admin-status {
+  text-align: center;
+  font-size: 1.3em;
+  font-weight: bold;
+  margin: 20px 0;
+}
+.admin-columns {
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.admin-col {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.log-box {
+  height: 400px;
+  overflow-y: auto;
+  background: #f4f7f6;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 6px;
+}
+.log-number {
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 50%;
+  font-weight: bold;
+  margin: 5px;
+}
+#winners-log li {
+  background: #e6f7ff;
+  border: 1px solid #b3e0ff;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  list-style-type: none;
+  font-size: 0.9em;
+}
+
+.admin-settings {
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.admin-settings label { margin: 0 10px 0 20px; font-weight: bold;}
+.admin-settings select, .admin-settings input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1em;}
+
+.admin-controls button { font-size: 1.1em; } /* Sedikit besarkan tombol kontrol */
+
+.admin-columns { /* Tata letak kolom */
+    gap: 30px;
+}
+.number-caller-col { /* Kolom pemanggil angka lebih lebar */
+    flex: 2;
+}
+.admin-col:last-child { /* Kolom log pemenang */
+    flex: 1;
+}
+
+/* Grid Angka Admin */
+#admin-number-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 8px;
+    margin-top: 15px;
+    max-height: 450px; /* Batasi tinggi & scroll jika perlu */
+    overflow-y: auto;
+    padding: 5px;
+}
+.number-button {
+    padding: 10px 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.number-button:hover:not(:disabled) {
+    background-color: #e9ecef;
+}
+.number-button.called {
+    background-color: #6c757d;
+    color: white;
+    text-decoration: line-through;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.number-button:disabled:not(.called) { /* Disabled tapi belum dipanggil (misal saat pause) */
+     background-color: #f8f9fa;
+     cursor: not-allowed;
+     opacity: 0.8;
+}
+/* Style baru untuk log angka terpanggil */
+#called-numbers-log {
+    padding: 10px;
+    display: flex; /* Pakai flexbox */
+    flex-direction: column; /* Ini "rapi kebawah" */
+    align-items: center; /* Tengahkan angkanya */
+    gap: 8px; /* Jarak antar angka */
+    max-height: 400px; /* Samakan dengan log-box lama */
+    overflow-y: auto; /* Scroll jika penuh */
+}
+
+.called-number-item {
+    font-size: 1.5em; /* Buat angkanya besar */
+    font-weight: bold;
+    color: #005aa7; /* Warna biru */
+    background-color: #e9ecef;
+    padding: 5px 15px;
+    border-radius: 20px; /* Buat jadi "pil" */
+    width: 80px; /* Lebar tetap */
+    text-align: center;
+    box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* Jangan sampai menciut */
+}

@@ -1,0 +1,60 @@
+/* --- Halaman Monitor Baru (monitor.html) --- */
+.monitor-page {
+    background: #1a1a2e; /* Warna gelap */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    /* Tambahkan padding agar teks tidak mepet pinggir */
+    padding: 20px; 
+}
+#monitor-number-container {
+    perspective: 1000px;
+    text-align: center; /* Pastikan di tengah */
+}
+#monitor-number {
+    /* UKURAN DEFAULT (UNTUK STATUS TEKS) */
+    font-size: 8vw; /* <<< KITA KECILKAN DARI 40vw */
+    font-weight: bold;
+    color: #ffd700; /* Emas */
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.3);
+    display: inline-block;
+    
+    /* STATUS DEFAULT (TERLIHAT) */
+    opacity: 1; 
+    transform: scale(1);
+    transition: opacity 0.3s, transform 0.3s; /* Transisi halus saat ganti teks */
+}
+
+/* Class baru untuk memicu animasi */
+#monitor-number-container.animating #monitor-number {
+    /* UKURAN SUPER BESAR (HANYA SAAT ANIMASI ANGKA) */
+    font-size: 40vw; /* <<< PINDAHKAN UKURAN BESAR KE SINI */
+    
+    /* State Awal Animasi (Sembunyi & Kecil) */
+    opacity: 0; 
+    transform: scale(0.5);
+    
+    /* Hapus transisi agar tidak bentrok dgn keyframe */
+    transition: none; 
+
+    /* Jalankan animasi 'numberPulse' selama 2.5 detik */
+    animation: numberPulse 2.5s ease-in-out forwards;
+}
+
+/* Keyframe (Tidak berubah) */
+@keyframes numberPulse {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    40% {
+        transform: scale(1.1); /* Membesar */
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.5); /* Mengecil dan Hilang */
+        opacity: 0;
+    }
+}

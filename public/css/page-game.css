@@ -1,0 +1,144 @@
+/* --- Halaman Game Pemain (game.html) --- */
+.game-header {
+  background: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.game-header h1 { margin: 0; font-size: 1.5em; color: #005aa7; }
+.player-info { font-size: 1.1em; }
+.call-display-mini { font-size: 1.2em; }
+.call-display-mini span {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #d9534f;
+  min-width: 40px;
+  display: inline-block;
+  text-align: center;
+}
+
+#status-bar {
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  font-size: 1.1em;
+}
+.status-idle, .status-stopped { background-color: #6c757d; }
+.status-running { background-color: #007bff; }
+
+.game-page h2, .game-page p { text-align: center; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+#tickets-container {
+  display: flex;
+  flex-direction: column; /* Ubah ke kolom agar bagian warna tumpuk */
+  align-items: center; /* Tetap di tengah */
+  gap: 30px; /* Jarak antar bagian warna */
+  padding: 20px;
+}
+
+/* Bagian Warna Tiket (DIUBAH UNTUK 1 TIKET) */
+.ticket-section {
+    width: 100%;
+    max-width: 600px; /* Lebarkan sedikit */
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.ticket-section h3 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #555;
+    border-bottom: 2px solid; /* Garis bawah judul */
+    padding-bottom: 5px;
+}
+
+/* Style untuk 1 tiket saja */
+.ticket-single { 
+    background-color: #f0f4f8; /* Warna netral */
+    border-left: 8px solid #005aa7; /* Border biru */
+}
+.ticket-single h3 { 
+    border-bottom-color: #005aa7; 
+}
+
+/* Grid Baru 5 Kolom x 6 Baris */
+.ticket-grid-5x6 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 kolom */
+  grid-template-rows: repeat(6, auto); /* 6 baris */
+  gap: 0; /* Hilangkan gap untuk tampilan tabel rapat */
+  background-color: #ffff00; /* Latar kuning untuk seluruh grid */
+  border: 2px solid #333; /* Border luar */
+  overflow: hidden; /* Agar border radius rapi */
+  border-radius: 8px;
+}
+
+.number-cell {
+  padding: 15px 5px;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-align: center;
+  background-color: #ffff00; /* Latar kuning */
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  border: 1px solid #999; /* Border tipis antar sel */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+}
+
+.number-cell.marked {
+  background-color: #28a745;
+  color: white;
+  text-decoration: line-through;
+  transform: scale(0.95);
+}
+.number-cell.shake {
+  animation: shake 0.3s;
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.prize-buttons {
+  margin-top: 15px;
+  display: flex; /* Biarkan flex */
+  justify-content: center; /* Pusatkan satu tombol */
+}
+.claim-button {
+  /* ... (gaya sebelumnya) ... */
+   min-width: 150px; /* Lebar minimum */
+   background-color: #007bff; /* Warna biru untuk klaim */
+   color: white;
+   font-size: 0.9em;
+   flex: 1; /* Ini dari style lama, mungkin diperlukan jika ada >1 tombol */
+   max-width: 200px; /* Batasi lebar tombol jika hanya satu */
+}
+.claim-button:disabled:not([style*="background-color"]) { /* Gaya disable SEBELUM sukses */
+    background-color: #aaa;
+}
+
+/* Separator hitam antara pasangan baris */
+/* Baris 2 (sel 6-10): border bawah tebal hitam */
+.number-cell:nth-child(n+6):nth-child(-n+10) {
+  border-bottom: 4px solid #000;
+}
+
+/* Baris 4 (sel 16-20): border bawah tebal hitam */
+.number-cell:nth-child(n+16):nth-child(-n+20) {
+  border-bottom: 4px solid #000;
+}

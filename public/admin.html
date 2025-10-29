@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Game KIM</title>
+  <link rel="stylesheet" href="/css/global.css"> <link rel="stylesheet" href="/css/page-admin.css"> </head>
+</head>
+<body class="admin-page">
+  <h1>Dasbor Admin Game KIM</h1>
+
+  <div id="admin-login-container">
+    <input type="password" id="admin-password" placeholder="Masukkan password admin...">
+    <button id="admin-login-button">Login</button>
+  </div>
+
+  <div id="admin-dashboard" style="display: none;">
+    <h2>Pengaturan & Kontrol Permainan</h2>
+
+    <div class="admin-settings">
+       <label for="win-condition">Target Menang:</label>
+        <select id="win-condition">
+           <option value="1_row" selected>1 Baris</option>
+           <option value="2_rows">2 Baris</option>
+           <option value="3_rows">3 Baris</option>
+           <option value="4_rows">4 Baris</option>  
+           <option value="5_rows">5 Baris</option>  
+           <option value="full_house">Full House (Semua Angka)</option>
+       </select>
+       <label for="max-winners">Maks Pemenang:</label>
+       <input type="number" id="max-winners" value="10" min="1">
+    </div>
+
+    <div class="admin-controls">
+      <button id="admin-start-button">MULAI PERMAINAN</button>
+      <button id="admin-pause-button" disabled>PAUSE / LANJUTKAN</button> <button id="admin-stop-button" disabled>HENTIKAN PERMAINAN</button>
+    </div>
+    <div id="admin-status">Status: IDLE</div>
+
+    <div class="admin-columns">
+      <div class="admin-col number-caller-col"> <h3>Panggil Angka Manual</h3>
+          <div id="admin-number-grid">
+              </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>
