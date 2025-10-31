@@ -24,28 +24,25 @@ app.get('/monitor', (req, res) => res.sendFile(path.join(__dirname, 'public', 'm
 // --- State Management Game ---
 const ADMIN_PASSWORD = 'admin123';
 let gameState = {
-  status: 'idle', // idle, running, paused, stopped
-  calledNumbers: new Set(), // Tetap Set untuk logika server
+  status: 'idle',
+  calledNumbers: new Set(),
   lastNumber: null,
   winners: [],
   maxWinners: 10,
-  winCondition: '1_row', // (1_row, 2_rows, 3_rows, 5_rows, full_house)
+  winCondition: '1_row',
   isPaused: false,
 };
-let players = new Map(); // playerId -> { id, name, tickets: [ ... ], socketId }
+let players = new Map();
 
 // --- Fungsi Helper Game ---
 
-// *** FUNGSI BARU UNTUK MEMPERBAIKI ERROR ***
-// Ini mengubah state internal (dengan Set) menjadi state yang aman dikirim (dengan Array)
 function getEmitSafeGameState() {
   return {
-    ...gameState, // Salin semua properti lain
-    calledNumbers: Array.from(gameState.calledNumbers) // UBAH Set jadi Array
+    ...gameState,
+    calledNumbers: Array.from(gameState.calledNumbers) 
   };
 }
 
-// MEMBUAT TIKET BARU (5 Kolom x 6 Baris = 30 Angka)
 function generateTicket() {
   const numbers = new Set();
   while (numbers.size < 30) {
@@ -60,27 +57,29 @@ function generateTicket() {
 
   const rows = [];
   for (let i = 0; i < 6; i++) {
+      // --- PERBAIKAN DI SINI ---
+      // Kita HAPUS .sort() agar data baris = data visual
       rows.push([
           cols[0][i], 
           cols[1][i], 
           cols[2][i], 
           cols[3][i], 
           cols[4][i]
-      ].sort((a,b)=>a-b));
+      ]);
+      // --- AKHIR PERBAIKAN ---
   }
 
   return {
     id: `T-${Math.random().toString(36).substr(2, 9)}`,
-    rows: rows,
-    cols: cols,
+    rows: rows, // Sekarang berisi data baris visual (tidak diurut)
+    cols: cols, // Ini masih dipakai untuk membuat tiket, tidak apa-apa
     allNumbers: arr,
-    wonRows: [false, false, false, false, false, false],
-    isComplete: false,
+    claimedRowIndices: new Set(),
+    winClaims: new Set() 
   };
 }
 
 
-// Fungsi memulai permainan
 function startGame(settings) {
   if (gameState.status === 'running' || gameState.status === 'paused') return;
 
@@ -95,8 +94,8 @@ function startGame(settings) {
 
    players.forEach(player => {
     player.tickets.forEach(ticket => {
-      ticket.wonRows = [false, false, false, false, false, false];
-      ticket.isComplete = false;
+      ticket.claimedRowIndices.clear();
+      ticket.winClaims.clear();
     });
    });
 
@@ -104,10 +103,8 @@ function startGame(settings) {
   io.emit('GAME_STATE_UPDATE', getEmitSafeGameState());
 }
 
-// Fungsi menghentikan permainan
 function stopGame(message = 'Permainan dihentikan oleh Admin.') {
   if (gameState.status === 'idle' || gameState.status === 'stopped') return;
-
   gameState.status = 'stopped';
   gameState.isPaused = false;
   io.emit('GAME_STOP', { message });
@@ -115,10 +112,8 @@ function stopGame(message = 'Permainan dihentikan oleh Admin.') {
   console.log(message);
 }
 
-// Fungsi Pause/Resume
 function togglePauseGame() {
     if (gameState.status !== 'running' && gameState.status !== 'paused') return;
-
     gameState.isPaused = !gameState.isPaused;
     gameState.status = gameState.isPaused ? 'paused' : 'running';
     io.emit('GAME_PAUSE_TOGGLE', gameState.isPaused);
@@ -126,12 +121,51 @@ function togglePauseGame() {
     console.log(`Permainan ${gameState.isPaused ? 'dipause' : 'dilanjutkan'}.`);
 }
 
+// --- Fungsi Helper untuk Cek Menang ---
+function checkMainWin(player, ticket) {
+    const totalClaims = ticket.claimedRowIndices.size; 
+    const condition = gameState.winCondition; 
+
+    let targetCount = 0;
+    if (condition === 'full_house') {
+        targetCount = 6; 
+    } else {
+        targetCount = parseInt(condition.split('_')[0]) || 1;
+    }
+
+    if (totalClaims >= targetCount && !ticket.winClaims.has(condition)) {
+        
+        ticket.winClaims.add(condition);
+
+        const winData = {
+            playerId: player.id, 
+            name: player.name,
+            ticketId: ticket.id,
+            description: condition.replace('_', ' '),
+            time: new Date().toLocaleTimeString('id-ID')
+        };
+        gameState.winners.push(winData);
+        console.log(`KLAIM UTAMA SUKSES: ${player.name} menang ${winData.description}.`);
+        
+        io.emit('WINNER_ANNOUNCEMENT', winData); 
+        io.emit('GAME_STATE_UPDATE', getEmitSafeGameState()); 
+
+        if (gameState.winners.length >= gameState.maxWinners) {
+            setTimeout(() => {
+                if(gameState.status === 'running' || gameState.status === 'paused'){
+                    stopGame('Kuota pemenang telah tercapai!');
+                }
+            }, 1000);
+        }
+    }
+}
+
 
 // --- Logika Koneksi Socket.IO ---
 io.on('connection', (socket) => {
   console.log(`Klien baru terhubung: ${socket.id}`);
 
-  // --- Event Login Pemain ---
+    // --- Event Login Pemain ---
   socket.on('PLAYER_LOGIN', (name) => {
     let nameExists = false;
     for (const player of players.values()) {
@@ -200,116 +234,55 @@ io.on('connection', (socket) => {
     if (gameState.calledNumbers.has(number)) return;
 
     console.log(`Admin memanggil angka: ${number}`);
-    gameState.calledNumbers.add(number); // Server tetap pakai Set
+    gameState.calledNumbers.add(number); 
     gameState.lastNumber = number;
 
     io.emit('NEW_NUMBER', number);
     io.emit('GAME_STATE_UPDATE', getEmitSafeGameState());
   });
 
-  // --- Event Klaim Kemenangan dari Pemain ---
-  socket.on('CLAIM_WIN', (ticketId) => {
+
+  // --- (PERUBAHAN BESAR) Event Klaim BARIS dari Pemain ---
+  socket.on('CLAIM_ROW', (data) => {
+    const { ticketId, rowIndex } = data;
     const playerId = socket.data.playerId;
     const player = players.get(playerId);
+    
+    const deny = (message) => {
+        socket.emit('CLAIM_DENIED', { rowIndex, message });
+    };
 
     if (!player || (gameState.status !== 'running' && gameState.status !== 'paused')) {
-      return socket.emit('CLAIM_DENIED', 'Gagal klaim: Permainan tidak sedang/sedang dijeda.');
+      return deny('Gagal klaim: Permainan tidak sedang/sedang dijeda.');
     }
     if (gameState.winners.length >= gameState.maxWinners) {
-       return socket.emit('CLAIM_DENIED', 'Maaf, kuota pemenang sudah terpenuhi.');
+       return deny('Maaf, kuota pemenang sudah terpenuhi.');
     }
 
     const ticket = player.tickets.find(t => t.id === ticketId);
-    if (!ticket) return socket.emit('CLAIM_DENIED', 'Tiket tidak ditemukan.');
+    if (!ticket) return deny('Tiket tidak ditemukan.');
 
-    let isWinner = false;
-    let winDescription = '';
-
-    let newlyCompletedRows = [];
-    ticket.rows.forEach((row, index) => {
-        if (!ticket.wonRows[index] && row.every(num => gameState.calledNumbers.has(num))) {
-            newlyCompletedRows.push(index);
-        }
-    });
-
-    let isFullHouse = ticket.allNumbers.every(num => gameState.calledNumbers.has(num));
-
-    // --- BLOK VALIDASI YANG DIPERBARUI ---
-    if (gameState.winCondition === '1_row') {
-        if (newlyCompletedRows.length >= 1) {
-            let winningRowIndex = newlyCompletedRows[0];
-            isWinner = true;
-            winDescription = `Baris ${winningRowIndex + 1}`;
-            ticket.wonRows[winningRowIndex] = true;
-        }
-    } else if (gameState.winCondition === '2_rows') {
-        if (newlyCompletedRows.length >= 2) {
-             isWinner = true;
-             winDescription = `2 Baris (Baris ${newlyCompletedRows[0]+1} & ${newlyCompletedRows[1]+1})`;
-             ticket.wonRows[newlyCompletedRows[0]] = true;
-             ticket.wonRows[newlyCompletedRows[1]] = true;
-        }
-    } else if (gameState.winCondition === '3_rows') { // <-- Logika 3 Baris
-        if (newlyCompletedRows.length >= 3) {
-             isWinner = true;
-             winDescription = `3 Baris (Baris ${newlyCompletedRows[0]+1}, ${newlyCompletedRows[1]+1} & ${newlyCompletedRows[2]+1})`;
-             ticket.wonRows[newlyCompletedRows[0]] = true; 
-             ticket.wonRows[newlyCompletedRows[1]] = true;
-             ticket.wonRows[newlyCompletedRows[2]] = true;
-        }
-    } else if (gameState.winCondition === '4_rows') { // <-- LOGIKA BARU 4 BARIS
-        if (newlyCompletedRows.length >= 4) {
-             isWinner = true;
-             winDescription = `4 Baris (Baris ${newlyCompletedRows[0]+1}, ${newlyCompletedRows[1]+1}, ${newlyCompletedRows[2]+1}, ${newlyCompletedRows[3]+1})`;
-             // Tandai 4 baris
-             ticket.wonRows[newlyCompletedRows[0]] = true; 
-             ticket.wonRows[newlyCompletedRows[1]] = true;
-             ticket.wonRows[newlyCompletedRows[2]] = true;
-             ticket.wonRows[newlyCompletedRows[3]] = true;
-        }
-    } else if (gameState.winCondition === '5_rows') { // <-- LOGIKA BARU 5 BARIS
-        if (newlyCompletedRows.length >= 5) {
-             isWinner = true;
-             winDescription = `5 Baris (Baris ${newlyCompletedRows[0]+1}, ${newlyCompletedRows[1]+1}, ${newlyCompletedRows[2]+1}, ${newlyCompletedRows[3]+1}, ${newlyCompletedRows[4]+1})`;
-             // Tandai 5 baris
-             ticket.wonRows[newlyCompletedRows[0]] = true; 
-             ticket.wonRows[newlyCompletedRows[1]] = true;
-             ticket.wonRows[newlyCompletedRows[2]] = true;
-             ticket.wonRows[newlyCompletedRows[3]] = true;
-             ticket.wonRows[newlyCompletedRows[4]] = true;
-        }
-    } else if (gameState.winCondition === 'full_house') {
-        if (!ticket.isComplete && isFullHouse) {
-            isWinner = true;
-            winDescription = 'Full House';
-            ticket.isComplete = true;
-        }
+    if (ticket.claimedRowIndices.has(rowIndex)) {
+        return deny(`Anda sudah pernah klaim Baris ${rowIndex + 1}!`);
     }
-    // --- AKHIR BLOK VALIDASI ---
 
-    if (isWinner) {
-      const winData = {
-        name: player.name,
-        ticketId: ticket.id,
-        description: winDescription,
-        time: new Date().toLocaleTimeString('id-ID')
-      };
-      gameState.winners.push(winData);
-      console.log(`KLAIM SUKSES: ${player.name} menang ${winDescription}.`);
-      socket.emit('CLAIM_APPROVED', winData);
-      io.emit('WINNER_ANNOUNCEMENT', winData);
-      io.emit('GAME_STATE_UPDATE', getEmitSafeGameState());
+    const row = ticket.rows[rowIndex]; // Ambil data baris (sekarang sudah tidak di-sort)
+    const isRowComplete = row.every(num => gameState.calledNumbers.has(num));
 
-      if (gameState.winners.length >= gameState.maxWinners) {
-        setTimeout(() => {
-             if(gameState.status === 'running' || gameState.status === 'paused'){
-                 stopGame('Kuota pemenang telah tercapai!');
-             }
-        }, 1000);
-      }
+    if (isRowComplete) {
+      console.log(`KLAIM BARIS: ${player.name} sukses klaim Baris ${rowIndex + 1}.`);
+      ticket.claimedRowIndices.add(rowIndex);
+
+      socket.emit('ROW_CLAIM_APPROVED', { 
+          rowIndex: rowIndex, 
+          description: `Baris ${rowIndex + 1}`
+      });
+
+      checkMainWin(player, ticket);
+
     } else {
-      console.log(`KLAIM GAGAL/PALSU: ${player.name} di tiket ${ticketId}`);
-      socket.emit('CLAIM_DENIED', `Klaim Anda tidak valid untuk kondisi "${gameState.winCondition.replace('_', ' ')}"!`);
+      console.log(`KLAIM GAGAL: ${player.name} di Baris ${rowIndex + 1} (belum lengkap)`);
+      return deny(`Klaim Baris ${rowIndex + 1} tidak valid! Angka belum lengkap.`);
     }
   });
 

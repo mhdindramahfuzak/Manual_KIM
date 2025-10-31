@@ -4,15 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Game KIM</title>
-  <link rel="stylesheet" href="/css/global.css"> <link rel="stylesheet" href="/css/page-login.css"> </head>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/page-login.css">
 </head>
 <body class="login-page">
   <div class="login-container">
     <h1>Selamat Datang di Game KIM</h1>
-    <p>Silakan masukkan nama Anda untuk mendapatkan 3 tiket permainan.</p>
+    <p>Silakan masukkan nama Anda untuk mendapatkan 1 tiket permainan.</p>
     <input type="text" id="name-input" placeholder="Masukkan nama Anda..." autocomplete="off">
     <button id="login-button">Masuk & Ambil Tiket</button>
-  </div>
+
+    <div class="info-container">
+      <h4>PERHATIAN UNTUK PESERTA:</h4>
+      <ul>
+        <li>Diharapkan memiliki jaringan internet yang stabil.</li>
+        <li>Pastikan baterai HP 100%. Jika tidak memadai, harap membawa power bank.</li>
+        <li>Setelah masuk, jangan pernah me-refresh atau logout halaman.</li>
+        <li>Jika Anda memenangkan Target Utama, segera lapor ke Admin di depan.</li>
+      </ul>
+    </div>
+    </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/main.js"></script>
 </body>

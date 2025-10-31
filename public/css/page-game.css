@@ -31,6 +31,8 @@
 }
 .status-idle, .status-stopped { background-color: #6c757d; }
 .status-running { background-color: #007bff; }
+.status-paused { background-color: #ffc107; color: #333; }
+
 
 .game-page h2, .game-page p { text-align: center; }
 
@@ -42,16 +44,16 @@
 
 #tickets-container {
   display: flex;
-  flex-direction: column; /* Ubah ke kolom agar bagian warna tumpuk */
-  align-items: center; /* Tetap di tengah */
-  gap: 30px; /* Jarak antar bagian warna */
+  flex-direction: column; 
+  align-items: center; 
+  gap: 30px; 
   padding: 20px;
 }
 
-/* Bagian Warna Tiket (DIUBAH UNTUK 1 TIKET) */
 .ticket-section {
     width: 100%;
-    max-width: 600px; /* Lebarkan sedikit */
+    /* (DIUBAH) Lebarkan sedikit untuk memberi ruang bagi tombol */
+    max-width: 750px; 
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
@@ -61,28 +63,39 @@
     margin-top: 0;
     margin-bottom: 15px;
     color: #555;
-    border-bottom: 2px solid; /* Garis bawah judul */
+    border-bottom: 2px solid; 
     padding-bottom: 5px;
 }
 
-/* Style untuk 1 tiket saja */
 .ticket-single { 
-    background-color: #f0f4f8; /* Warna netral */
-    border-left: 8px solid #005aa7; /* Border biru */
+    background-color: #f0f4f8; 
+    border-left: 8px solid #005aa7; 
 }
 .ticket-single h3 { 
     border-bottom-color: #005aa7; 
 }
 
+/* --- PERUBAHAN BESAR MULAI DI SINI --- */
+
+/* (BARU) Class pembungkus untuk grid + tombol */
+.ticket-layout-container {
+    display: flex;
+    flex-direction: row;
+    gap: 15px; /* Jarak antara grid dan kolom tombol */
+}
+
 /* Grid Baru 5 Kolom x 6 Baris */
 .ticket-grid-5x6 {
+  /* (BARU) Biarkan grid mengambil sisa ruang */
+  flex: 1; 
+  
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 kolom */
-  grid-template-rows: repeat(6, auto); /* 6 baris */
-  gap: 0; /* Hilangkan gap untuk tampilan tabel rapat */
-  background-color: #ffff00; /* Latar kuning untuk seluruh grid */
-  border: 2px solid #333; /* Border luar */
-  overflow: hidden; /* Agar border radius rapi */
+  grid-template-columns: repeat(5, 1fr); 
+  grid-template-rows: repeat(6, auto); 
+  gap: 0; 
+  background-color: #ffff00; 
+  border: 2px solid #333; 
+  overflow: hidden; 
   border-radius: 8px;
 }
 
@@ -91,11 +104,11 @@
   font-size: 1.3em;
   font-weight: bold;
   text-align: center;
-  background-color: #ffff00; /* Latar kuning */
+  background-color: #ffff00; 
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
-  border: 1px solid #999; /* Border tipis antar sel */
+  border: 1px solid #999; 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -114,31 +127,35 @@
   color: #721c24;
 }
 
+/* (DIUBAH) Styling untuk kolom tombol */
 .prize-buttons {
-  margin-top: 15px;
-  display: flex; /* Biarkan flex */
-  justify-content: center; /* Pusatkan satu tombol */
-}
-.claim-button {
-  /* ... (gaya sebelumnya) ... */
-   min-width: 150px; /* Lebar minimum */
-   background-color: #007bff; /* Warna biru untuk klaim */
-   color: white;
-   font-size: 0.9em;
-   flex: 1; /* Ini dari style lama, mungkin diperlukan jika ada >1 tombol */
-   max-width: 200px; /* Batasi lebar tombol jika hanya satu */
-}
-.claim-button:disabled:not([style*="background-color"]) { /* Gaya disable SEBELUM sukses */
-    background-color: #aaa;
+  margin-top: 0; /* Hapus margin atas */
+  display: flex;
+  flex-direction: column; /* Susun tombol secara vertikal */
+  gap: 5px; /* Jarak antar tombol */
+  width: 120px; /* Tentukan lebar kolom tombol */
 }
 
-/* Separator hitam antara pasangan baris */
-/* Baris 2 (sel 6-10): border bawah tebal hitam */
+/* (DIUBAH) Styling untuk tombol individu */
+.claim-button {
+   width: 100%; /* Penuhi lebar kolom */
+   flex: 1; /* (BARU) Buat setiap tombol memiliki tinggi yang sama */
+   background-color: #007bff; 
+   color: white;
+   font-size: 0.9em;
+   padding: 8px 5px; /* Sesuaikan padding */
+}
+
+.claim-button:disabled:not([style*="background-color"]) {
+    background-color: #aaa;
+}
+/* --- AKHIR PERUBAHAN --- */
+
+
+/* Separator hitam (tidak berubah) */
 .number-cell:nth-child(n+6):nth-child(-n+10) {
   border-bottom: 4px solid #000;
 }
-
-/* Baris 4 (sel 16-20): border bawah tebal hitam */
 .number-cell:nth-child(n+16):nth-child(-n+20) {
   border-bottom: 4px solid #000;
 }

@@ -1,60 +1,129 @@
 /* --- Halaman Monitor Baru (monitor.html) --- */
+
 .monitor-page {
-    background: #1a1a2e; /* Warna gelap */
+    background: #1a1a2e;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: row;
+    align-items: stretch;
     height: 100vh;
     overflow: hidden;
-    /* Tambahkan padding agar teks tidak mepet pinggir */
-    padding: 20px; 
+    padding: 15px;
+    gap: 15px;
+    box-sizing: border-box;
 }
-#monitor-number-container {
-    perspective: 1000px;
-    text-align: center; /* Pastikan di tengah */
+
+/* ===== PANEL KIRI (GRID 1-90) ===== */
+#monitor-grid-panel {
+    flex: 0 0 35%;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-#monitor-number {
-    /* UKURAN DEFAULT (UNTUK STATUS TEKS) */
-    font-size: 8vw; /* <<< KITA KECILKAN DARI 40vw */
+
+#monitor-grid-header {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: clamp(4px, 0.4vw, 8px);
+    width: 100%;
+    max-width: 100%;
+}
+
+.monitor-grid-cell {
+    aspect-ratio: 1 / 1;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(0.7rem, 1.1vw, 1.2rem);
     font-weight: bold;
-    color: #ffd700; /* Emas */
+    transition: all 0.3s ease;
+}
+
+.monitor-grid-cell.called {
+    background: #ffd700;
+    color: #1a1a2e;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* ===== PANEL KANAN (ANGKA BESAR) ===== */
+#monitor-number-container {
+    flex: 1;
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 20px;
+}
+
+#monitor-number {
+    font-size: clamp(3rem, 8vw, 10rem);
+    font-weight: bold;
+    color: #ffd700;
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.3);
     display: inline-block;
-    
-    /* STATUS DEFAULT (TERLIHAT) */
-    opacity: 1; 
+    opacity: 1;
     transform: scale(1);
-    transition: opacity 0.3s, transform 0.3s; /* Transisi halus saat ganti teks */
+    transition: opacity 0.3s, transform 0.3s;
+    text-align: center;
+    line-height: 1.1;
 }
 
-/* Class baru untuk memicu animasi */
+/* Class untuk animasi (Saat angka baru muncul) */
 #monitor-number-container.animating #monitor-number {
-    /* UKURAN SUPER BESAR (HANYA SAAT ANIMASI ANGKA) */
-    font-size: 40vw; /* <<< PINDAHKAN UKURAN BESAR KE SINI */
-    
-    /* State Awal Animasi (Sembunyi & Kecil) */
-    opacity: 0; 
+    font-size: clamp(10rem, 35vw, 40rem);
+    opacity: 0;
     transform: scale(0.5);
-    
-    /* Hapus transisi agar tidak bentrok dgn keyframe */
-    transition: none; 
-
-    /* Jalankan animasi 'numberPulse' selama 2.5 detik */
+    transition: none;
     animation: numberPulse 2.5s ease-in-out forwards;
 }
 
-/* Keyframe (Tidak berubah) */
+/* Keyframe */
 @keyframes numberPulse {
-    0% {
-        transform: scale(0.5);
-        opacity: 0;
-    }
-    40% {
-        transform: scale(1.1); /* Membesar */
-        opacity: 1;
-    }
-    100% {
-        transform: scale(0.5); /* Mengecil dan Hilang */
-        opacity: 0;
-    }
+    0% { transform: scale(0.5); opacity: 0; }
+    40% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.5); opacity: 0; }
+}
+
+/* ===== Watermark ===== */
+.watermark {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: clamp(0.75rem, 1.1vw, 1.1rem);
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.8;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.watermark span {
+    display: block;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.watermark span:first-child {
+    color: rgba(255, 215, 0, 0.8);
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+#called-numbers-bar {
+    display: none;
 }

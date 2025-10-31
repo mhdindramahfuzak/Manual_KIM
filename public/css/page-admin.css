@@ -24,6 +24,44 @@
   color: white;
 }
 
+/* ============ TAMBAHAN BARU DI SINI ============ */
+.admin-info-box {
+  margin-top: 25px;
+  padding: 15px;
+  background-color: #f0f4f8;
+  border: 1px solid #cce5ff;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 0.9em;
+  color: #333;
+}
+.admin-info-box h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #004085;
+}
+.admin-info-box p {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+.admin-info-box b {
+  display: block;
+  margin-bottom: 5px;
+}
+.admin-info-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.admin-info-box li {
+  margin-bottom: 5px;
+}
+.admin-info-box a {
+  color: #0056b3;
+  font-weight: bold;
+}
+/* ============ AKHIR TAMBAHAN ============ */
+
+
 #admin-dashboard h2 { text-align: center; }
 .admin-controls {
   display: flex;
@@ -92,25 +130,24 @@
 .admin-settings label { margin: 0 10px 0 20px; font-weight: bold;}
 .admin-settings select, .admin-settings input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1em;}
 
-.admin-controls button { font-size: 1.1em; } /* Sedikit besarkan tombol kontrol */
+.admin-controls button { font-size: 1.1em; } 
 
-.admin-columns { /* Tata letak kolom */
+.admin-columns { 
     gap: 30px;
 }
-.number-caller-col { /* Kolom pemanggil angka lebih lebar */
+.number-caller-col { 
     flex: 2;
 }
-.admin-col:last-child { /* Kolom log pemenang */
+.admin-col:last-child { 
     flex: 1;
 }
 
-/* Grid Angka Admin */
 #admin-number-grid {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     gap: 8px;
     margin-top: 15px;
-    max-height: 450px; /* Batasi tinggi & scroll jika perlu */
+    max-height: 450px; 
     overflow-y: auto;
     padding: 5px;
 }
@@ -134,31 +171,30 @@
     cursor: not-allowed;
     opacity: 0.7;
 }
-.number-button:disabled:not(.called) { /* Disabled tapi belum dipanggil (misal saat pause) */
+.number-button:disabled:not(.called) { 
      background-color: #f8f9fa;
      cursor: not-allowed;
      opacity: 0.8;
 }
-/* Style baru untuk log angka terpanggil */
 #called-numbers-log {
     padding: 10px;
-    display: flex; /* Pakai flexbox */
-    flex-direction: column; /* Ini "rapi kebawah" */
-    align-items: center; /* Tengahkan angkanya */
-    gap: 8px; /* Jarak antar angka */
-    max-height: 400px; /* Samakan dengan log-box lama */
-    overflow-y: auto; /* Scroll jika penuh */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 8px; 
+    max-height: 400px; 
+    overflow-y: auto; 
 }
 
 .called-number-item {
-    font-size: 1.5em; /* Buat angkanya besar */
+    font-size: 1.5em; 
     font-weight: bold;
-    color: #005aa7; /* Warna biru */
+    color: #005aa7; 
     background-color: #e9ecef;
     padding: 5px 15px;
-    border-radius: 20px; /* Buat jadi "pil" */
-    width: 80px; /* Lebar tetap */
+    border-radius: 20px; 
+    width: 80px; 
     text-align: center;
     box-shadow: 0 2px 2px rgba(0,0,0,0.1);
-    flex-shrink: 0; /* Jangan sampai menciut */
+    flex-shrink: 0; 
 }

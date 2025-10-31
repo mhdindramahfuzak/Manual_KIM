@@ -37,3 +37,27 @@
 .login-container button:hover {
   background-color: #218838;
 }
+
+.info-container {
+  margin-top: 25px;
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 0.9em;
+  color: #333;
+}
+.info-container h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #005aa7;
+  font-weight: bold;
+}
+.info-container ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.info-container li {
+  margin-bottom: 5px;
+}

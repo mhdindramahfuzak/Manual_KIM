@@ -11,23 +11,18 @@ const ticketsContainer = document.getElementById('tickets-container');
 const winConditionDisplay = document.getElementById('win-condition-display');
 
 // --- State Klien ---
-let myTickets = []; // Tetap array, tapi isinya 1 tiket
-let clientCalledNumbers = new Set(); // Ini adalah "kebenaran" (angka yg sudah dipanggil Admin)
-let playerMarkedNumbers = new Set(); // Ini adalah "catatan" (angka yg sudah diklik Pemain)
-let currentWinCondition = '';
+let myTickets = []; 
+let clientCalledNumbers = new Set(); // "Kebenaran" dari Server
+let playerMarkedNumbers = new Set(); // "Catatan" klik dari Pemain
 
 // --- Fungsi ---
-
-// (FUNGSI BARU) Muat tanda dari localStorage
 function loadPlayerMarks() {
-    // Kita pakai ID pemain agar unik
     const marks = localStorage.getItem(`kim_marks_${playerId}`);
     if (marks) {
         playerMarkedNumbers = new Set(JSON.parse(marks));
     }
 }
 
-// (FUNGSI BARU) Simpan tanda ke localStorage
 function savePlayerMarks() {
     localStorage.setItem(`kim_marks_${playerId}`, JSON.stringify(Array.from(playerMarkedNumbers)));
 }
@@ -39,17 +34,18 @@ function renderTickets(tickets) {
   const ticket = tickets[0];
   myTickets = tickets;
 
-  ticketsContainer.innerHTML = ''; // Kosongkan kontainer
-
+  ticketsContainer.innerHTML = '';
   const ticketEl = document.createElement('div');
   ticketEl.classList.add('ticket-section', 'ticket-single'); 
   ticketEl.dataset.ticketId = ticket.id;
 
   let ticketHTML = `<h3>Tiket Utama</h3>`;
-  ticketHTML += `<div class="ticket-grid-5x6">`;
+  ticketHTML += `<div class="ticket-layout-container">`;
 
-  ticket.cols.forEach(column => {
-    column.forEach(number => {
+  // Render grid berdasarkan TICKET.ROWS
+  ticketHTML += `<div class="ticket-grid-5x6">`;
+  ticket.rows.forEach(row => { 
+    row.forEach(number => { 
       ticketHTML += `<div class="number-cell"
                          data-number="${number}"
                          data-ticket-id="${ticket.id}">
@@ -59,9 +55,18 @@ function renderTickets(tickets) {
   });
   ticketHTML += `</div>`; 
 
-  ticketHTML += `<div class="prize-buttons">
-      <button class="claim-button" data-ticket-id="${ticket.id}">Klaim Hadiah!</button>
-    </div>`;
+  // Buat 6 Tombol Klaim
+  ticketHTML += `<div class="prize-buttons">`;
+  for (let i = 0; i < 6; i++) {
+      ticketHTML += `<button class="claim-button" 
+                         data-ticket-id="${ticket.id}" 
+                         data-row-index="${i}" 
+                         disabled>
+                     Klaim Baris ${i + 1}
+                     </button>`;
+  }
+  ticketHTML += `</div>`;
+  ticketHTML += `</div>`; 
 
   ticketEl.innerHTML = ticketHTML;
   ticketsContainer.appendChild(ticketEl);
@@ -70,97 +75,78 @@ function renderTickets(tickets) {
     cell.addEventListener('click', handleNumberClick);
   });
 
-  document.querySelector('.claim-button').addEventListener('click', handleClaimClick);
+  document.querySelectorAll('.claim-button').forEach(button => {
+    button.addEventListener('click', handleClaimClick);
+  });
 
-  // Tandai angka yg sudah dipanggil saat render awal
-  updateCalledNumbersOnTickets();
+  updateTicketVisuals();
 }
 
-// Fungsi ini SEKARANG HANYA menandai berdasarkan apa yg DIKLIK pemain
-function updateCalledNumbersOnTickets() {
+function updateTicketVisuals() {
+    
+    // TUGAS 1: Tandai Sel berdasarkan "Catatan" Pemain
     document.querySelectorAll('.number-cell').forEach(cell => {
-        // DIGANTI: Cek ke 'playerMarkedNumbers', bukan 'clientCalledNumbers'
-        if (playerMarkedNumbers.has(parseInt(cell.dataset.number))) {
-            cell.classList.add('marked');
+        const number = parseInt(cell.dataset.number);
+        if (playerMarkedNumbers.has(number)) {
+            cell.classList.add('marked'); 
+            cell.style.cursor = 'default'; 
         } else {
              cell.classList.remove('marked');
+             cell.style.cursor = 'pointer'; 
         }
     });
-    // Aktifkan tombol klaim (logika ini tetap cek ke "kebenaran"/clientCalledNumbers)
-    if (myTickets.length > 0) {
-      checkWinConditionOnTicket(myTickets[0].id);
+
+    // --- PERUBAHAN LOGIKA DI SINI ---
+    // TUGAS 2: Cek Tombol Klaim 
+    if (myTickets.length === 0) return;
+    const ticket = myTickets[0];
+
+    for (let i = 0; i < 6; i++) {
+        const button = document.querySelector(`.claim-button[data-row-index="${i}"]`);
+        if (!button || button.innerText === 'KLAIM SUKSES') continue;
+        
+        const row = ticket.rows[i];
+        
+        // Syarat 1: Cek apakah SEMUA angka di baris ini sudah dipanggil server
+        const isServerValid = row.every(num => clientCalledNumbers.has(num));
+        
+        // Syarat 2: Cek apakah SEMUA angka di baris ini sudah diklik pemain
+        const isPlayerMarked = row.every(num => playerMarkedNumbers.has(num));
+        
+        // Tombol HANYA aktif jika KEDUA syarat terpenuhi
+        button.disabled = !(isServerValid && isPlayerMarked);
     }
+    // --- AKHIR PERUBAHAN LOGIKA ---
 }
 
 function handleNumberClick(e) {
   const cell = e.target;
   const number = parseInt(cell.dataset.number);
-  const ticketId = cell.dataset.ticketId;
 
-  // Cek ke "kebenaran" (clientCalledNumbers)
   if (clientCalledNumbers.has(number)) {
-    // Jika benar, tandai
     cell.classList.add('marked');
-    // (BARU) Catat di "catatan" pemain
+    cell.style.cursor = 'default';
+    
     playerMarkedNumbers.add(number); 
-    // (BARU) Simpan catatan
     savePlayerMarks(); 
     
-    // Cek kondisi menang (tetap pakai "kebenaran")
-    checkWinConditionOnTicket(ticketId);
+    // --- TAMBAHAN PENTING ---
+    // Setelah klik, cek ulang semua tombol
+    updateTicketVisuals(); 
+    // --- AKHIR TAMBAHAN ---
+
   } else {
-    // Jika salah (angka belum dipanggil), goyang
     cell.classList.add('shake');
     setTimeout(() => cell.classList.remove('shake'), 300);
   }
-}
-
-// Fungsi ini TIDAK BERUBAH. Tombol klaim aktif berdasarkan "kebenaran" (clientCalledNumbers),
-// BUKAN berdasarkan apa yg dicentang pemain. Ini mencegah pemain curang.
-function checkWinConditionOnTicket(ticketId) {
-    if (myTickets.length === 0) return;
-    const ticket = myTickets[0];
-    if (!ticket) return;
-
-    const claimButton = document.querySelector(`.claim-button[data-ticket-id="${ticketId}"]`);
-    if (!claimButton || claimButton.innerText === 'KLAIM SUKSES') return;
-
-    let canClaim = false;
-    let completedRowsCount = 0;
-    
-    // Cek 6 baris berdasarkan "kebenaran" (angka yg dipanggil Admin)
-    ticket.rows.forEach(row => {
-        if (row.every(num => clientCalledNumbers.has(num))) {
-            completedRowsCount++;
-        }
-    });
-    
-    let isFullHouse = ticket.allNumbers.every(num => clientCalledNumbers.has(num));
-
-    if (currentWinCondition === '1_row' && completedRowsCount === 1) {
-        canClaim = true;
-    } else if (currentWinCondition === '2_rows' && completedRowsCount === 2) {
-        canClaim = true;
-    } else if (currentWinCondition === '3_rows' && completedRowsCount === 3) {
-        canClaim = true;
-    } else if (currentWinCondition === '4_rows' && completedRowsCount === 4) {
-        canClaim = true;
-    } else if (currentWinCondition === '5_rows' && completedRowsCount === 5) {
-        canClaim = true;
-    } else if (currentWinCondition === 'full_house' && isFullHouse) {
-        // Full house adalah pengecualian, tetap >= 30 (atau 'isFullHouse')
-        canClaim = true;
-    }
-  
-    claimButton.disabled = !canClaim;
 }
 
 
 function handleClaimClick(e) {
   const button = e.target;
   const ticketId = button.dataset.ticketId;
-
-  socket.emit('CLAIM_WIN', ticketId);
+  const rowIndex = parseInt(button.dataset.rowIndex); 
+  socket.emit('CLAIM_ROW', { ticketId, rowIndex });
   button.disabled = true;
   button.innerText = 'Memvalidasi...';
 }
@@ -171,7 +157,8 @@ function updateGameStatusUI(status, message = '', winCondition = '') {
   currentWinCondition = winCondition; 
 
   if (status === 'running' || status === 'paused') {
-      const conditionText = winCondition.replace('_', ' ');
+      let conditionText = winCondition.replace('_', ' ');
+      if (winCondition === 'full_house') conditionText = '6 Baris (Full House)';
       winConditionDisplay.textContent = conditionText;
       statusText = status === 'paused' ? 'Permainan Dijeda Admin...' : 'Permainan Berlangsung...';
   } else {
@@ -185,81 +172,81 @@ if (!playerId || !playerName) {
   window.location.href = '/';
 } else {
   playerNameDisplay.innerText = playerName;
-  loadPlayerMarks(); // (BARU) Muat "catatan" pemain dulu
-  socket.emit('GET_PLAYER_DATA', playerId); // Baru minta data tiket
+  loadPlayerMarks(); 
+  socket.emit('GET_PLAYER_DATA', playerId); 
 }
 
 // --- Event Listener dari Server ---
 
 socket.on('PLAYER_DATA', (player) => {
   renderTickets(player.tickets);
+  updateTicketVisuals();
 });
 
 socket.on('GAME_STATE_UPDATE', (gameState) => {
-  clientCalledNumbers = new Set(gameState.calledNumbers); // Update "kebenaran"
+  clientCalledNumbers = new Set(gameState.calledNumbers); 
   lastNumberDisplay.innerText = gameState.lastNumber || '-';
   updateGameStatusUI(gameState.status, '', gameState.winCondition);
-  // (DIUBAH) Ini sekarang aman, hanya update visual berdasarkan "catatan" pemain
-  updateCalledNumbersOnTickets(); 
+  updateTicketVisuals(); 
 });
 
 socket.on('NEW_NUMBER', (number) => {
-  clientCalledNumbers.add(number); // Update "kebenaran"
+  clientCalledNumbers.add(number); 
   lastNumberDisplay.innerText = number;
-  
-  // (DIUBAH) Kita TIDAK panggil 'updateCalledNumbersOnTickets' di sini.
-  // Kita HANYA cek apakah tombol Klaim bisa diaktifkan.
-  if (myTickets.length > 0) {
-    checkWinConditionOnTicket(myTickets[0].id);
-  }
+  // Ini akan cek tombol, tapi tombol tidak akan nyala
+  // sampai pemain mengklik angkanya
+  updateTicketVisuals();
 });
 
-socket.on('CLAIM_APPROVED', (winData) => {
-  alert(`SELAMAT! Klaim Anda untuk ${winData.description} di tiket ${winData.ticketId} DISAHKAN!`);
-  const button = document.querySelector(`.claim-button[data-ticket-id="${winData.ticketId}"]`);
-  if (button) {
-    button.innerText = 'KLAIM SUKSES';
-    button.style.backgroundColor = '#28a745';
-    button.disabled = true;
-  }
+socket.on('ROW_CLAIM_APPROVED', (data) => {
+    const button = document.querySelector(`.claim-button[data-row-index="${data.rowIndex}"]`);
+    if (button) {
+        button.innerText = 'KLAIM SUKSES';
+        button.style.backgroundColor = '#28a745';
+        button.disabled = true;
+    }
 });
 
-socket.on('CLAIM_DENIED', (message) => {
-  alert(message);
-  const button = document.querySelector(`.claim-button`);
+socket.on('WINNER_ANNOUNCEMENT', (winData) => {
+    if (winData.playerId === playerId) {
+         alert(`SELAMAT! Anda memenangkan target: ${winData.description}!`);
+    }
+});
+
+socket.on('CLAIM_DENIED', (data) => {
+  alert(data.message);
+  const button = document.querySelector(`.claim-button[data-row-index="${data.rowIndex}"]`);
   if (button && button.innerText !== 'KLAIM SUKSES') {
-    button.disabled = false;
-    button.innerText = 'Klaim Hadiah!';
-    checkWinConditionOnTicket(button.dataset.ticketId);
+    updateTicketVisuals(); 
   }
 });
 
 socket.on('ERROR_REDIRECT', (message) => {
   alert(message);
-  // (BARU) Hapus "catatan" pemain jika error
-  localStorage.removeItem(`kim_marks_${playerId}`); 
+  localStorage.removeItem(`kim_marks_${playerId}`);
   localStorage.clear();
   window.location.href = '/';
 });
 
 socket.on('GAME_START', (data) => {
   updateGameStatusUI('running', 'Permainan dimulai!', data.winCondition);
-  const button = document.querySelector('.claim-button');
-  if (button) {
+  document.querySelectorAll('.claim-button').forEach((button, i) => {
       button.disabled = true;
-      button.innerText = 'Klaim Hadiah!';
+      button.innerText = `Klaim Baris ${i + 1}`;
       button.style.backgroundColor = '';
-  }
-  clientCalledNumbers.clear(); // Hapus "kebenaran"
-  playerMarkedNumbers.clear(); // (BARU) Hapus "catatan" pemain
-  savePlayerMarks(); // (BARU) Simpan "catatan" yg kosong
-  updateCalledNumbersOnTickets(); // Update visual (hapus semua centang)
+  });
+  
+  clientCalledNumbers.clear();
+  playerMarkedNumbers.clear(); 
+  savePlayerMarks(); 
+  updateTicketVisuals();
 });
 
 socket.on('GAME_STOP', (data) => {
   updateGameStatusUI('stopped', data.message);
-  const button = document.querySelector('.claim-button');
-  if (button) button.disabled = true;
+  document.querySelectorAll('.claim-button').forEach(button => {
+      button.disabled = true;
+  });
 });
 
 socket.on('GAME_PAUSE_TOGGLE', (isPaused) => {
